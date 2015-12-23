@@ -1,0 +1,31 @@
+import(cluster)
+import(methods)
+import(graphics)
+import(Biobase)
+exportClasses(Bootstrap)
+exportClasses(DiStatis)
+exportClasses(GroupProj)
+exportClasses(SelectVar)
+exportMethods(Biplot)
+exportMethods(BootPlot)
+exportMethods(Bootstrap)
+exportMethods(CompPlot)
+export(DiStatis)
+exportMethods(GroupProj)
+exportMethods(PanelPlot)
+exportMethods(RVPlot)
+exportMethods(SelectVar)
+exportMethods(TrajPlot)
+exportMethods(print)
+exportMethods(summary)
+export(Inertia.RV,
+       RV,Euclid.Im,
+       Inertia.comp,
+       Compromise.Coords,
+       Compromise.Matrix,
+ RQO,Trajectories)
+ export(Ratios.Boot,Comparisions.Boot,Elipses.Boot,
+Stability.Boot,QRO.Boot,EigValues.Boot,Inertia.Boot)
+
+export(SortList,ProyGroups,Groups)
+export(Coord.Select,Table.Select,List.Selec.Var, List.Selec.Est)

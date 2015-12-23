@@ -1,0 +1,342 @@
+\documentclass[a4paper]{article}
+\usepackage{natbib}
+\usepackage[latin1]{inputenc}
+\usepackage{authblk}
+\usepackage{amsmath}
+\usepackage{afterpage}
+\usepackage{subfigure}
+\usepackage[figuresright]{rotating}
+\let\proglang=\textsf
+\let\pkg=\textsf
+
+
+\let\proglang=\textsf
+\let\pkg=\textsf
+% \VignetteIndexEntry{kimod A K-tables approach to integrate multiple Omics-Data in R}
+
+
+\title{\pkg{kimod} A K-tables approach to integrate multiple Omics-Data in \proglang{R}}
+\author[1]{M L Zingaretti}
+\author[2]{J A Demey Zambrano}
+\author[2]{J L Vicente Villard\'on}
+\author[3]{J R Demey}
+\affil[1]{IAPCBA-IAPCH, Universidad Nacional de Villa Mar\'ia}
+\affil[3]{Departamento de Estad\'istica, Universidad de Salamanca}
+\affil[3]{Fellow Prometeo Senescyt, Escuela Superior Polit\'ecnica del Litoral (ESPOL)}
+
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\maketitle
+
+\begin{abstract}
+\emph{kimod} is to do multivariate data analysis of k-tables, in particular it makes STATIS methodology, designed to handle multiple data tables that quantity sets of variables collected on the same observations. This package allows to work with mixed data, with the introduction of the following improvements: distance options (for numeric and/or categorical variables) for each of the tables, bootstrap resampling techniques on the residual matrix of STATIS- compromise, that enable perform confidence ellipses for the projection of observations, and regressions Biplot to project all variables on the compromise matrix. In this way, goodness of fit criteria are used for variables selection and building relationships between observations and variables. Moreover, this allows generating clustering of variables which are powerfully related to each other and consequently get the same information. Since the main purpose of the package is to use these techniques to omic data analysis, it includes an example data from four different microarray platforms of the NCI-60 cell lines.
+\end{abstract}
+
+\section{Introduction}
+In the last years, the data of microarrays has not only gained a great importance but also it is availability for the public has increase. The "omics" technologies allow quantitative knowledge of hundreds of biological data of complex nature and have enabled the opportunity of study simultaneously, based on multiple datasets, the expression levels of thousands of genes over the effects of certain treatments or diseases. However, the joint analysis of the different subspaces that generate these technologies and their relations is not simple. Several statistical methods have been developed to handle these problems and to calculate a consensus from data matrices. STATIS-ACT \citep{DesPlan},\citep{escoufier1976} is one of the families of methods that are concerned with analysis of data arising from several configurations and is a powerful technique to compare subspaces. The aim of this package is to combine STATIS,  Biplot \citep{Gabriel1971}, \citep{Demey2008} and Cluster methodologies  to study the relationships between genes expressions of multiple omics datasets measuring the same biological samples or the  expression  of the same genes over different experimental conditions.
+
+\section{STATIS methodology}
+
+The STATIS methodology is an family of exploratory technique of multivariate data analysis based on linear algebra and especially Euclidean vector spaces (ACT stands for Analyse Conjointe de Tableaux, STATIS stands for Structuration des Tableaux A Trois Indices de la Statistique). It has been devised for multiway data situations on the basic idea of computing Euclidean distances between configurations of points \citep{escoufier1973}.
+
+In studies of genetic diversity the STATIS is a technique that it allows determine contribution of each observation to the Euclidean distance between the subspaces defined by   the molecular markers and morphological traits.
+
+Formally, the central idea of the technique is to compare configurations of the same observations obtained in different circumstances. Thus we need to introduce a measure of similarity between two configurations. This is equivalent to define a distance between the corresponding scalar product matrices. These matrices are:
+\begin{equation}
+\label{eq1}
+W_{k}=XX^T
+\end{equation}
+
+We can use the classic Euclidean norm
+
+\begin{equation}
+	\|W_{1}-W_{2}\|^{2}=\sum_{k}\sum_{k^T}[(W_{1}-W_{2})_{kk^T} ]^{2}=Tr[(W_{1}-W_{2})^2]
+\end{equation}
+
+On some cases when the variables are not all continuous, the scalar product can not compute. DISTATIS approach, we compute $K$ distance matrices instead of Scalar Product (See \ref{eq1})  between observations, further we transform these matrices into cross-product matrices and then use the cross-product approach to STATIS (See \citep{Abdi2007}, \citep{Abdi2012}). In these works, the autors only proposed the euclidean metrics, however in this package, we extend this approach and incorporating different metrics, extending the use of STATIS-ACT to other types of variables.
+Three aspects are considered in the application of the method, the study of Interstructure, the boundary of the Compromise space and the Graphical representation of the trajectories.
+\subsection{STEPS of STATIS}
+\begin{enumerate}
+\item Interstructure: Define a distance between $W_k's$ configurations matrix and generate a matrix of scalar product $W_{kxk}$, later,  use the spectral decompositon of  $W$ to projection of all studies in a space of low dimension.
+\item Compromise: Define a matrix $W_{nxn}$ that $\sum_{k=1}^{n}\alpha_{k}W_{k}$ with the property that is the linear combination of the $W_k's$ the most related to each $W_k$. Finally, use the singular value decomposition for plotting all observations on consensus espace.
+\item Trajectories: These gives a  idea of the importance and the direction of the change of position of all observations between the stages $k$ and $k'$.
+\end{enumerate}
+
+\subsection{Sampling Variability and Biplot Analysis}
+
+Following \citep{Demey2008a}, the results of any data analysis are not thorough if they do not offer information about the stability of the solution that show whether the structure detected by the analysis is not random. There are several ways to accomplish this purpose, including the introduction of small perturbations in the data, resampling techniques or applying permutations.
+
+ As for other sorting techniques, the sensitivity study of solutions in methods K- tables has hardly received any attention. Therefore, as part of this work, intents to study the stability sample of the average projections of individuals/variables or individuals-variables on parent commitment of the various methods.
+
+Specifically, the use of bootstrap \citep{efron1993} is proposes for the building confidence regions on the projection of the individual on the compromise matrix ($W$).
+%This is acquiring from the projection of self- decomposition of said matrix and is called $P$.
+
+In order to acquire the sampling variability, $B$ configurations must be generated of matrix $W$, for an algorithm, which on the matrix of residuals is used as detailed below.
+
+ The eigen-decomposition of $W$ matrix is:
+ \begin{equation}
+ \hat{W}=U_{q}D_{q}V_{q}
+ \label{ec2}
+ \end{equation}
+
+The objective is then to find a configuration $P$ in a lower dimensional Euclidean space. A lower dimensional approximation can be obtained projecting using the equation \ref{ec2} (usually $q =2$). ($W$), can be break down as $W=\hat{W}+ \epsilon$ , making $\epsilon$ a matrix of residual with the same properties as $W$ and $\hat{W}$ , it is the low range estimation ($q<r$) of $W$.
+Resampling $B$ times on $n(n-1)/2$ different elements outside the diagonal matrix $\epsilon$, $B$ replicates are generated so  $W^{*}_{i}=\hat{W}+ \epsilon_{i}^{*}, i=1..B$. Using the new matrices $W_{i}^{*}$  , it is possible to generate (from eigen-decomposition) new $B$ matrices   $P_{i}^{*}$ that can compared to the original configuration ($P$) and create the desired sampling variability.
+
+
+\subsection{Using Biplot to project variables on compromise}
+
+In general, from the use of methods STATIS is only possible to show in a graph of individual or variables and no individual and variables. Often, researchers do not only want to know the relationships established between observations, but also between these and variables involved or between the variables themselves. In case of omics data where K-tables can be  different platforms or  technologies, study relationship between genes and observations is appropiate and necessary and enables gene selection.
+The classical definition of these methods is that enables the graphical approximation of the multivariable data matrixes -of order ($nxp$) and range $r-$, using columns and lines makers to study the relationships between individuals and variables from the singular values decomposition. In this case,$Y$ be the matrix obtained by interactively coding all the matrices $Y=[X_1|X_2|...X_K]$:
+
+
+\begin{equation}
+Y=UDV^T
+\end{equation}
+
+The approximation of equation can also be performed through a general multiplicative bilinear model \citep{vicente2006}, \citep{Demey2008}, \citep{sanchez2013}:
+
+\begin{equation}
+Y =P\beta ^T+\epsilon
+\end{equation}
+
+Which can be understood as a multivariate regression of $Y$ on the coordinates of individuals $P$, when they are fixed, or they are multivariate regression $Y^T$ on the coordinates of the variables $\beta$, if they are who are fixed.
+
+We add here a biplot interpretation of the method, based on the projection of the all variables onto the compromise space.
+Let  $Y$ be the matrix obtained by interactively coding all the matrices ($X_{k}$: $Y=[X_1|X_2|...X_K]$, of order $n$x$J$, where $J$ is $J=\sum_{i=1}^K j_{i}$, and $P$ is an fixed matrix of the projection of all observations on the compromise, obtained from the eigen-decomposition of $W_c$, such as stated in section 1.
+\\
+Given that $P$ coordinates are known, obtaining the $\beta's$ is equivalent to performing a linear regression using the $j-th$ column of $Y$ as a response variable and the columns of $P$ as regressors. Thus, the projection of a individuals on the direction of an variable predicts the level of expression of such variable on this observations. With this biplot approximation on the compromise in the classic STATIS method, it is possible to project the variables of different data tables (in other words, all the genes involved in the study) and determine relationships between tissues and genes, genes with each other.
+
+In classical STATIS, it is not possible to interpret the relationship between variables or variables and observations. With biplot aproximation, obtained by fitting linear regressions to that configuration as described in this section, it´s posible obtain these relationships.
+\\
+Due to the high number of variables usually studied, it is convenient to situate on the graph only those that are related to the configuration, i.e. those that have an adequate goodness of fit after adjusting the regression model \citep{Demey2008a}. In addition, the technique can be used to select candidate genes, representatives of the data structure, using measures of goodness of fit, among this can be the adjusted R-squared, p value, p-value corrected by Bonferroni or criteria AIC (Akaike Information Criterious) and BIC (Bayesian Information Criterious).
+\\
+Besides, these method allows generate groups of variables using a clustering algorithm.
+
+
+\section{Examples}
+In this section we provide an overview of the \pkg{kimod} package.
+The example consist in the analysis of four different microarrays platforms (i.e., Agilent, Afymetrix HGU 95, Afymetrix HGU 133 and Afymetrix HGU 133plus 2.0) on the NCI-60 cell lines \citep{Shankavaram2009},\citep{Reinhold2012}. These datasets are illustrative and they have only a subset of microarray gene expression of the NCI 60 cell lines from four different platforms.
+
+
+\subsection{Package overview}
+The original data Files are available at Cell-Miner WebSite \citep{Shankavaram2009},\citep{Reinhold2012}. In this dataset, the 60 human tumour cell lines are derived from patients with leukaemia, melanoma, lung, colon, central nervous system, ovarian, renal, breast and prostate cancers. The cell line panel is widely used in anti-cancer drug screen. In this dataset, a subset of microarray gene expression of the NCI 60 cell lines from four different platforms are combined in a list.
+
+<<Package>>=
+
+library("kimod")
+@
+
+<<Data>>=
+data(NCI60Selec_ESet)
+@
+Once we call the datasets, we ckeck your class using the class() comand:
+<<Data>>=
+class(NCI60Selec_ESet)
+@
+
+Then, check the dimensions of datasets.
+<<Head>>=
+lapply(NCI60Selec_ESet,dim)
+@
+
+Finally, we ckeck if all tables have the same observations:
+<<Head>>=
+Tissues<-c(rep("Breast",5),rep("CNS",6),rep("Colon",7),
+rep("Leukemia",6),rep("Melanoma",10),rep("Lung",9),
+rep("Ovarian",7),rep("Prostate",2),rep("Renal",8))
+@
+Next command returns an array with the rownames of all tables
+
+<<Head>>=
+Names<-sapply(NCI60Selec_ESet,rownames)
+@
+And if the  following command is TRUE, it means of all matrix have the same observations:
+
+<<Head>>=
+unique(apply(Names[,-1],2,function(y)identical(y,Names[,1])))
+@
+
+Once the preprocessing of the experiment data is completed, the STATIS method can be carried out using by calling DiStatis function of \textbf{kimod} package:
+
+<<Head>>=
+Z1<-DiStatis(NCI60Selec_ESet)
+@
+<<Head>>=
+class(Z1)
+@
+
+Z1 if an object of DiStatis S4-class, if is printing the main slots of Z1 are: distance. methods (that indicates the kind of distance (or scalar product) that is calculated in each study, Inertia of Vectorial Correlation, Euclidean image of studies, compromise matrix, $P$ matrix for projection all observations in consensus- space, representation quality of observations and trajectories(i.e, the rows of the initial tables are projected in the  the compromise-strucucture).
+To obtain the euclidean image of studies, runs:
+
+<<code>>=
+RVPlot(Z1)
+@
+
+The figure \ref{figure2} shows the relative contributions of each of the tables to Components 1 and 2. Thus, we can see that Study 1 (correspondent to Agilent platform it has the lowest contribute to the compromise.
+
+\begin{figure}[h]
+  \centering
+ \begin{center}
+<<fig=TRUE ,echo=FALSE >>=
+RVPlot(Z1,barPlot=FALSE)
+@
+ \caption{Contribution of all tables to the compromise.}
+    \label{figure2}
+
+ \end{center}
+\end{figure}
+
+To obtain the projection of observations on compromise, runs:
+
+<<Head>>=
+Tissues<-c(rep("Breast",5),rep("CNS",6),rep("Colon",7),
+rep("Leukemia",6),rep("Melanoma",10),rep("Lung",9),
+rep("Ovarian",7),rep("Prostate",2),rep("Renal",8))
+@
+<<Head>>=
+Colours<-c(rep(colors()[657],5),rep(colors()[637],6),
+ rep(colors()[537],7),rep(colors()[552],6),rep(colors()[57],10),
+ rep(colors()[300],9),rep(colors()[461],7),rep(colors()[450],2),
+ rep(colors()[432],8))
+@
+<<Code2 >>=
+CompPlot(Z1,xlabBar="",colObs=Colours,pch=15,las=1,
+ cex=2,legend=FALSE,barPlot=FALSE,cex.main=0.6,cex.lab=0.6,
+ cex.axis=0.6,las=1)
+ legend("topleft",unique(Tissues),col=unique(Colours),
+ bty="n",pch=16,cex=1)
+@
+
+
+The figure \ref{figure3}  shows the projection of s cell lines onto the first two principal components of Compromise-structure. Cell lines  of leukemia, melanoma and colon are clearly distinguished from the others. However, a melanoma cell line has similar profiles to carcinomas (CNS, renal ovarian, lung). Furthermore, the breast cancer varies widely, grouping itself some samples with colon tissues and others with CNS.
+\begin{figure}[h]
+\centering
+\begin{center}
+<<fig=TRUE ,echo=FALSE >>=
+CompPlot(Z1,xlabBar="",colObs=Colours,pch=15,las=1,
+ cex=2,legend=FALSE,barPlot=FALSE,cex.main=0.6,cex.lab=0.6,
+ cex.axis=0.6,las=1)
+ legend("topleft",unique(Tissues),col=unique(Colours),
+ bty="n",pch=16,cex=1)
+@
+ \caption{Compromise Plot. Projection of all tumoral tissues in the consensus space.}
+    \label{figure3}
+\end{center}
+\end{figure}
+
+The Sample Variability is obtained by using Bootstrap and BootPlot functions. Bootstrap receives as argument an object of DiStatis Class and BootPlot performs the Sample-Variaibility-Plot (see figure \ref{figure1}). The Slot "Comparision.Boot"  show difference between observations using the Bonferroni Correction for all dimensions.
+
+
+<<Code3 >>=
+B<-Bootstrap(Z1)
+BootPlot(B,Points=FALSE,cex.lab=0.7,cex.axis=0.7,
+ las=1,xlimi=c(-0.003,0.002),ylimi=c(-0.005,0.007)
+ ,legend=FALSE,col=Colours)
+ legend("topleft",unique(Tissues),col=unique(Colours),
+ bty="n",pch=16,cex=1)
+Comparisions.Boot(B)
+
+@
+
+On figure \ref{figure4} can be seen than then melanoma tissues have  high internal variability. Moreover, from  slot(B,"Comparisions.Boot"), we can see that Colon, Leukemia, $BR.MCF$ and $LC_NCI_H522$ tissues separates from others.
+
+
+\begin{figure}[h]
+\begin{center}
+<<fig=TRUE ,echo=FALSE >>=
+BootPlot(B,Points=FALSE,cex.lab=0.7,cex.axis=0.7,
+ las=1,xlimi=c(-0.003,0.002),ylimi=c(-0.005,0.007)
+ ,legend=FALSE,col=Colours)
+ legend("topleft",unique(Tissues),col=unique(Colours),
+ bty="n",pch=16,cex=1)
+@
+ \caption{Sample-Variability Plot}
+    \label{figure4}
+\end{center}
+\end{figure}
+
+
+For performs gene selection, responsibles of the tissues projections, and explore gene expression profiles, we can use the SelectVar function, that receives an main argument of DiStatis class. This function allows to build the biplot for continuous response, using an external procedure to obtained the regresors in the linear model (see section 4). Furthermore, allows select genes using measures of goodness of fit of the Models Biplot: adjusted $R^2$, P-value with bonferroni correction, AIC or BIC. The percentage of selected variables is an user input (See figure \ref{figure5}).
+
+<<Code4 >>=
+M1<-SelectVar(Z1,Crit="R2-Adj",perc=0.95)
+layout(matrix(c(1,1,1,1,1,1,2,2),c(1,1,1,1,1,1,2,2),byrow=TRUE))
+Biplot(M1,labelObs = FALSE,labelVars=FALSE,
+       colObs=Colours,Type="SQRT",las=1,cex.axis=0.8,
+       cex.lab=0.8,xlimi=c(-3,3),ylimi=c(-3,3))
+
+plot(0,type='n',axes=FALSE,ann=FALSE)
+legend("topright",unique(Tissues),col=unique(Colours),
+       bty="n",pch=15,cex=1)
+@
+
+\begin{figure}[h]
+\begin{center}
+<<fig=TRUE ,echo=FALSE >>=
+layout(matrix(c(1,1,1,1,1,1,2,2),c(1,1,1,1,1,1,2,2),byrow=TRUE))
+Biplot(M1,labelObs = FALSE,labelVars=FALSE,
+       colObs=Colours,Type="SQRT",las=1,cex.axis=0.8,
+       cex.lab=0.8,xlimi=c(-3,3),ylimi=c(-3,3))
+
+plot(0,type='n',axes=FALSE,ann=FALSE)
+legend("topright",unique(Tissues),col=unique(Colours),
+       bty="n",pch=15,cex=1)
+@
+ \caption{Biplot. Projection of gene-selected on Compromise}
+    \label{figure5}
+\end{center}
+\end{figure}
+
+Besides,f Groups argument in this function is TRUE,
+the variables will be clustered using Euclidean distance and Ward algorithm  (see figure \ref{figure6}).
+
+\begin{figure}[h]
+\begin{center}
+<<fig=TRUE ,echo=FALSE >>=
+layout(matrix(c(1,1,1,1,1,1,2,2),c(1,1,1,1,1,1,2,2),byrow=TRUE))
+Biplot(M1,labelObs = FALSE,labelVars=FALSE,
+       colObs=Colours,Type="SQRT",las=1,cex.axis=0.8,
+       cex.lab=0.8,xlimi=c(-3,3),ylimi=c(-3,3),Groups=TRUE,NGroups=4)
+
+plot(0,type='n',axes=FALSE,ann=FALSE)
+legend("topright",unique(Tissues),col=unique(Colours),
+       bty="n",pch=15,cex=1)
+@
+ \caption{Biplot. Projection of gene-selected on Compromise}
+    \label{figure6}
+\end{center}
+\end{figure}
+
+Finally, to see relationships between gene clusters and tissues, may be used the GroupProj function, that receives an main argument of SelectVar class. This function use the  cluster package \citep{cluster} which is automatically called in our package.
+
+<<Code6 >>=
+
+A1<-GroupProj(M1,method="ward",metric="euclidean",NGroups=4)
+head(SortList(A1)[[1]])
+
+@
+
+The list shows that genes of cluster 1 are over-expressed in melanoma and CSN tissues and under-expressed in colon and leukemia (black in figure \ref{figure6}). \\
+The gene on cluster 2 are over-expressed in Breast, CSN, Lung, Renal, Ovarion and Colon and under-expressed in melanoma and leukemia (red in figure \ref{figure6}). \\
+The cluster 3 is related  to under-expression in colon and leukemia tissues and over-expression on CSN and melanoma, mainly (green in in figure \ref{figure6}) .
+\\
+Finally, the cluster 4  is associated to high expression in Colon and leukemia tissues and breast: BR.MCF7 and BR.T47D. The list of all cluster gene is obtained:
+
+<<Code7 >>=
+
+A1<-GroupProj(M1,method="ward",metric="euclidean",NGroups=4)
+Groups(A1)
+@
+
+
+
+\bibliographystyle{apalike}
+\bibliography{cites}
+
+\section*{Session Info}
+<<Session Info, echo=true>>=
+sessionInfo()
+@
+
+\end{document}
