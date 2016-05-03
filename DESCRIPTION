@@ -1,7 +1,7 @@
 Package: kimod
 Type: Package
 Title: A k-tables approach to integrate multiple Omics-Data
-Version: 0.99.5
+Version: 1.0.0
 Date: 2015-12-7
 Author: Maria Laura Zingaretti, Johanna Altair Demey-Zambrano, Jose Luis Vicente-Villardon, Jhonny Rafael Demey
 Maintainer: M L Zingaretti <m.lau.zingaretti@gmail.com>
