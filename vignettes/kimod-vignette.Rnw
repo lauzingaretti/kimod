@@ -5,6 +5,7 @@
 \usepackage{amsmath}
 \usepackage{afterpage}
 \usepackage{subfigure}
+\usepackage{amssymb}
 \usepackage[figuresright]{rotating}
 \let\proglang=\textsf
 \let\pkg=\textsf
@@ -16,21 +17,22 @@
 
 
 \title{\pkg{kimod} A K-tables approach to integrate multiple Omics-Data in \proglang{R}}
-\author[1]{M L Zingaretti}
-\author[2]{J A Demey Zambrano}
-\author[2]{J L Vicente Villard\'on}
-\author[3]{J R Demey}
+\author[1,2]{M L Zingaretti}
+\author[3]{J A Demey Zambrano}
+\author[3]{J L Vicente Villard\'on}
+\author[4]{J R Demey}
 \affil[1]{IAPCBA-IAPCH, Universidad Nacional de Villa Mar\'ia}
+\affil[2]{Centre For Research in Agricultural Genomics (CRAG)}
 \affil[3]{Departamento de Estad\'istica, Universidad de Salamanca}
-\affil[3]{Fellow Prometeo Senescyt, Escuela Superior Polit\'ecnica del Litoral (ESPOL)}
-
+\affil[4]{Deceased 27 July 2016.}
 
 \begin{document}
 \SweaveOpts{concordance=TRUE}
 \maketitle
 
 \begin{abstract}
-\emph{kimod} is to do multivariate data analysis of k-tables, in particular it makes STATIS methodology, designed to handle multiple data tables that quantity sets of variables collected on the same observations. This package allows to work with mixed data, with the introduction of the following improvements: distance options (for numeric and/or categorical variables) for each of the tables, bootstrap resampling techniques on the residual matrix of STATIS- compromise, that enable perform confidence ellipses for the projection of observations, and regressions Biplot to project all variables on the compromise matrix. In this way, goodness of fit criteria are used for variables selection and building relationships between observations and variables. Moreover, this allows generating clustering of variables which are powerfully related to each other and consequently get the same information. Since the main purpose of the package is to use these techniques to omic data analysis, it includes an example data from four different microarray platforms of the NCI-60 cell lines.
+Modern ``omics" technologies enable quantitative checking of numerous biologicals samples in an unprecedented scale. Thus, it is possible to measure the expression of thousands of genes, proteins and metabolites at the same time, and the whole analysis of them could be provide more information than the analysis of a single source of data. As follows, currently, data integration is one of the most important aims in biosciences. This integration involves both the meta-analysis of the results and the simultaneous analysis of the raw data. \\
+In this package, we present a novel algorithm that uses a combination of \textbf{$k$-tables} and \textbf{Biplot} methods to approach both, the problem of the simultaneous studies and comparison, and the problem of gene selection of multiple microarrays data, moreover this algorithm allow analyze the sample variability trough \textbf{Bootstrap}. The performance of the methodology it is illustring by analyzing a small subset of the four gene expression data of 60 cell lines of nine different tissues (brain, blood and bone marrow, breast, colon, kidney, lung, ovary, prostate and skin) available at NCI-60 panel.\\
 \end{abstract}
 
 \section{Introduction}
@@ -76,12 +78,12 @@ In order to acquire the sampling variability, $B$ configurations must be generat
 
  The eigen-decomposition of $W$ matrix is:
  \begin{equation}
- \hat{W}=U_{q}D_{q}V_{q}
+ \widehat{W}=U_{q}D_{q}V_{q}
  \label{ec2}
  \end{equation}
 
-The objective is then to find a configuration $P$ in a lower dimensional Euclidean space. A lower dimensional approximation can be obtained projecting using the equation \ref{ec2} (usually $q =2$). ($W$), can be break down as $W=\hat{W}+ \epsilon$ , making $\epsilon$ a matrix of residual with the same properties as $W$ and $\hat{W}$ , it is the low range estimation ($q<r$) of $W$.
-Resampling $B$ times on $n(n-1)/2$ different elements outside the diagonal matrix $\epsilon$, $B$ replicates are generated so  $W^{*}_{i}=\hat{W}+ \epsilon_{i}^{*}, i=1..B$. Using the new matrices $W_{i}^{*}$  , it is possible to generate (from eigen-decomposition) new $B$ matrices   $P_{i}^{*}$ that can compared to the original configuration ($P$) and create the desired sampling variability.
+The objective is then to find a configuration $P$ in a lower dimensional Euclidean space. A lower dimensional approximation can be obtained projecting using the equation \ref{ec2} (usually $q =2$). ($W$), can be break down as $W=\widehat{W}+ \epsilon$ , making $\epsilon$ a matrix of residual with the same properties as $W$ and $\widehat{W}$ , it is the low range estimation ($q<r$) of $W$.
+Resampling $B$ times on $n(n-1)/2$ different elements outside the diagonal matrix $\epsilon$, $B$ replicates are generated so  $W^{*}_{i}=\widehat{W}+ \epsilon_{i}^{*}, i=1..B$. Using the new matrices $W_{i}^{*}$  , it is possible to generate (from eigen-decomposition) new $B$ matrices   $P_{i}^{*}$ that can compared to the original configuration ($P$) and create the desired sampling variability.
 
 
 \subsection{Using Biplot to project variables on compromise}
@@ -340,3 +342,6 @@ sessionInfo()
 @
 
 \end{document}
+
+
+
